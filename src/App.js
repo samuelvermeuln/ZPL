@@ -8,15 +8,15 @@ import ZebraBrowserPrintWrapper from 'zebra-browser-print-wrapper';
 function App() {
 
   const [ evSelect,setEvSelect ] = useState('');
-  const [ impressoraDefault,setImpressoraDefault ] = useState(null)
+  const [ impressoraDefault,setImpressoraDefault ] = useState('')
 
   // Create a new instance of the object
   const browserPrint =  new ZebraBrowserPrintWrapper();
 
   useEffect(async()=>{
     const defaultPrinter =  await browserPrint.getDefaultPrinter();
-    setImpressoraDefault(defaultPrinter)
-    console.log('=>>',impressoraDefault)
+    setImpressoraDefault(defaultPrinter.name)
+    console.log('=>>',defaultPrinter.name)
   },[])
 
 
@@ -62,7 +62,11 @@ function App() {
             className="md-form amber-textarea active-amber-textarea"
           >
             Escolha sua impressora Zebra{" "}
-            <select id="selected_device" value={impressoraDefault} ></select>
+
+            <select id="selected_device" value={impressoraDefault} >
+              <option value={impressoraDefault}>{impressoraDefault}</option>
+            </select>
+
             <i className="fas fa-pencil-alt prefix"></i>
             <textarea
               id="campo"

@@ -31,7 +31,7 @@
     #id_button{
         background-color: white;
         color: black;
-        width: 100px;
+        width: 250px;
         border: 2px solid #C83134; /* Green */
         margin-top:10px;
         transition-duration: 0.4s;

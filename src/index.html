@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link href='style.css' rel="stylesheet" >
+        <title>Unilog</title>
+</head>
+<body>
+    <div id='conteiner'>
+
+        <div id='id_imgLogo'>
+            <img src='https://lh3.googleusercontent.com/proxy/YgojotWJJt0uhoXoxhbsxd7c-OWf9_WPEFI6uRGL284qO5e1t03HbcXTtbY5HoPrIjfTdnX8gb8mbuXHAV76xrOO_n9rFr-7aqsc4KGBX5anKA' />
+        </div>
+
+        <!--Textarea with icon prefix-->
+        <div id='id_textArea' class="md-form amber-textarea active-amber-textarea">
+            Escolha sua impressora Zebra <select id="selected_device" onchange=onDeviceSelected(this);></select>
+
+            <i class="fas fa-pencil-alt prefix"></i>
+            <textarea id="campo" class="md-textarea form-control" rows="5%" autofocus></textarea>
+            <!-- <label for="form22">Escreva na caixa para Imprimir</label> -->
+            <button id='id_button' onclick="ImprimirText();" >Imprimir</button>
+        </div>
+
+    </div>
+
+    <style>
+        .amber-textarea textarea.md-textarea:focus:not([readonly]) {
+            border-bottom: 2px solid #CB3135;
+            box-shadow: 0 1px 0 0 #CB3135;
+            }
+
+            #conteiner{
+                width: 90%;
+                height: 100%;
+                display:flex; 
+                justify-content:center;
+                align-items:center;
+            }
+
+            #id_textArea{
+            width: 40%;
+            height: 20rem;
+            line-height: 50px;
+            text-align:center;
+            
+            /* pura mágica */
+            position: absolute;
+            top: 50%; /* posiciona na metade da tela */
+            margin-top: -25px; /* e retrocede metade da altura */
+            }
+
+            #id_imgLogo{
+                margin-top: 5%;
+                position: auto;
+
+            }
+            #id_button{
+                background-color: white;
+                color: black;
+                width: 100px;
+                border: 2px solid #C83134; /* Green */
+                margin-top:10px;
+                transition-duration: 0.4s;
+                border-radius: 6px;
+            }
+
+            #id_button:hover{
+                background-color: #E5989A;
+            }
+
+            body {
+            display:flex; 
+            justify-content:center;
+            align-items:center;
+            }
+    </style>
+
+    <script type="text/javascript" src="BrowserPrint-Zebra-1.0.216.min.js"></script>
+    <script type="text/javascript" src="BrowserPrint-3.0.216.min.js"></script>
+
+    <script type="text/javascript" >
+
+        var selected_device;
+            var devices = [];
+            function setup() {
+                //Get the default device from the application as a first step. Discovery takes longer to complete.
+                BrowserPrint.getDefaultDevice(
+                    "printer",
+                    function (device) {
+                        //Add device to list of devices and to html select element
+                        selected_device = device;
+                        devices.push(device);
+                        var html_select = document.getElementById("selected_device");
+                        var option = document.createElement("option");
+                        option.text = device.name;
+                        html_select.add(option);
+
+                        //Discover any other devices available to the application
+                        BrowserPrint.getLocalDevices(
+                            function (device_list) {
+                                for (var i = 0; i < device_list.length; i++) {
+                                    //Add device to list of devices and to html select element
+                                    var device = device_list[i];
+                                    if (!selected_device || device.uid != selected_device.uid) {
+                                        devices.push(device);
+                                        var option = document.createElement("option");
+                                        option.text = device.name;
+                                        option.value = device.uid;
+                                        html_select.add(option);
+                                    }
+                                }
+                            },
+                            function () {
+                                alert("Error getting local devices");
+                            },
+                            "printer"
+                        );
+                    },
+                    function (error) {
+                        alert(error);
+                    }
+                );
+            }
+            function getConfig() {
+                BrowserPrint.getApplicationConfiguration(
+                    function (config) {
+                        alert(JSON.stringify(config));
+                    },
+                    function (error) {
+                        alert(JSON.stringify(new BrowserPrint.ApplicationConfiguration()));
+                    }
+                );
+            }
+            function writeToSelectedPrinter(dataToWrite) {
+                selected_device.send(dataToWrite, undefined, errorCallback);
+            }
+            var readCallback = function (readData) {
+                if (readData === undefined || readData === null || readData === "") {
+                    alert("No Response from Device");
+                } else {
+                    alert(readData);
+                }
+            };
+            var errorCallback = function (errorMessage) {
+                alert("Error: " + errorMessage);
+            };
+            function readFromSelectedPrinter() {
+                selected_device.read(readCallback, errorCallback);
+            }
+            function getDeviceCallback(deviceList) {
+                alert("Devices: \n" + JSON.stringify(deviceList, null, 4));
+            }
+
+            function sendImage(imageUrl) {
+                url = window.location.href.substring(
+                    0,
+                    window.location.href.lastIndexOf("/")
+                );
+                url = url + "/" + imageUrl;
+                selected_device.convertAndSendFile(url, undefined, errorCallback);
+            }
+            function sendFile(fileUrl) {
+                url = window.location.href.substring(
+                    0,
+                    window.location.href.lastIndexOf("/")
+                );
+                url = url + "/" + fileUrl;
+                selected_device.sendFile(url, undefined, errorCallback);
+            }
+            function onDeviceSelected(selected) {
+                for (var i = 0; i < devices.length; ++i) {
+                    if (selected.value == devices[i].uid) {
+                        selected_device = devices[i];
+                        return;
+                    }
+                }
+            }
+            window.onload = setup;
+
+            function ImprimirText() {
+                writeToSelectedPrinter(document.getElementById("campo").value);
+            }
+
+
+    </script>
+</body>
+</html>

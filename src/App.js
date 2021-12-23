@@ -13,13 +13,17 @@ function App() {
   // Create a new instance of the object
   const browserPrint =  new ZebraBrowserPrintWrapper();
 
+  useEffect(()=>{
+    const defaultPrinter =  await browserPrint.getDefaultPrinter();
+    setImpressoraDefault(defaultPrinter)
+    console.log('=>>',impressoraDefault)
+  },[])
+
 
   const FuncaoImprimir = async () => {
     try{
       // console.log(evSelect);
       const defaultPrinter =  await browserPrint.getDefaultPrinter();
-      setImpressoraDefault(defaultPrinter)
-
       // Set the printer
       browserPrint.setPrinter(defaultPrinter);
 

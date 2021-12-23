@@ -17,8 +17,12 @@ function App() {
     const defaultPrinter =  await browserPrint.getDefaultPrinter();
     setImpressoraDefault(defaultPrinter.name)
     console.log('=>>',defaultPrinter.name)
-  },[])
+  },[]) 
 
+  setInterval(
+    () => {console.log("SAMUEL => APLICAÇÂO ZPL, PARA UNILOG")}, 
+    5000
+  )
 
   const FuncaoImprimir = async () => {
     try{

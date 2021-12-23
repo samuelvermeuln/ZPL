@@ -1,19 +1,45 @@
 /* eslint-disable no-undef */
 /* eslint-disable no-unused-expressions */
-import { useState } from 'react';
-import "./BrowserPrint-3.0.216.min";
-import "./BrowserPrint-Zebra-1.0.216.min";
+import { useEffect, useState } from 'react';
 import './App.css';
 import logo from './logo-unilog.png';
-import { funcaoJS } from './BrowserPrint-Zebra-1.0.216.min';
+import ZebraBrowserPrintWrapper from 'zebra-browser-print-wrapper';
 
 function App() {
 
-  const[evSelect,setEvSelect] = useState('');
+  const [ evSelect,setEvSelect ] = useState('');
+  const [ impressoraDefault,setImpressoraDefault ] = useState(null)
 
-  const FuncaoImprimir = () => {
-    console.log(evSelect);
-    // ImprimirText(evSelect);
+  // Create a new instance of the object
+  const browserPrint =  new ZebraBrowserPrintWrapper();
+
+
+  const FuncaoImprimir = async () => {
+    try{
+      // console.log(evSelect);
+      const defaultPrinter =  await browserPrint.getDefaultPrinter();
+      setImpressoraDefault(defaultPrinter)
+
+      // Set the printer
+      browserPrint.setPrinter(defaultPrinter);
+
+      // Check printer status
+      const printerStatus = await browserPrint.checkPrinterStatus();
+
+      // Check if the printer is ready
+      if(printerStatus.isReadyToPrint) {
+
+          // ZPL script to print a simple barcode          
+          browserPrint.print(evSelect.trim());
+
+      } else {
+        console.log("Error/s", printerStatus.errors);
+      }
+    }
+    catch(error) {
+      throw new Error(error);
+    }
+
   }
 
   return (
@@ -32,7 +58,7 @@ function App() {
             className="md-form amber-textarea active-amber-textarea"
           >
             Escolha sua impressora Zebra{" "}
-            <select id="selected_device" onchange={""}></select>
+            <select id="selected_device" value={impressoraDefault} onchange={""}></select>
             <i className="fas fa-pencil-alt prefix"></i>
             <textarea
               id="campo"

@@ -13,7 +13,7 @@ function App() {
   // Create a new instance of the object
   const browserPrint =  new ZebraBrowserPrintWrapper();
 
-  useEffect(()=>{
+  useEffect(async()=>{
     const defaultPrinter =  await browserPrint.getDefaultPrinter();
     setImpressoraDefault(defaultPrinter)
     console.log('=>>',impressoraDefault)

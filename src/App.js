@@ -62,7 +62,7 @@ function App() {
             className="md-form amber-textarea active-amber-textarea"
           >
             Escolha sua impressora Zebra{" "}
-            <select id="selected_device" value={impressoraDefault} onchange={""}></select>
+            <select id="selected_device" value={impressoraDefault} ></select>
             <i className="fas fa-pencil-alt prefix"></i>
             <textarea
               id="campo"
